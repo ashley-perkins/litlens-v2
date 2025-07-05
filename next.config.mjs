@@ -13,11 +13,6 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: [],
   },
-  api: {
-    bodyParser: {
-      sizeLimit: '25mb',
-    },
-  },
 }
 
 export default nextConfig

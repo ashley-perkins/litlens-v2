@@ -3,17 +3,8 @@ import { headers } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
-    // Check content length before processing
-    const contentLength = request.headers.get('content-length')
-    if (contentLength && parseInt(contentLength) > 25 * 1024 * 1024) { // 25MB limit to account for multipart overhead
-      return NextResponse.json(
-        { 
-          error: 'Request too large',
-          details: 'Total file size exceeds 20MB limit. Please reduce file size or number of files.'
-        },
-        { status: 413 }
-      )
-    }
+    // Note: Vercel handles request size limits at the platform level
+    // If the request is too large, it will be rejected before reaching this code
 
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]

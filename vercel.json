@@ -8,8 +8,5 @@
     "app/api/*/route.ts": {
       "maxDuration": 60
     }
-  },
-  "limits": {
-    "maxRequestSize": "25mb"
   }
 }
