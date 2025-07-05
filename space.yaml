@@ -1,0 +1,10 @@
+# space.yaml
+
+title: LitLens
+emoji: 🧠📚
+colorFrom: indigo
+colorTo: pink
+sdk: docker
+python_file: backend/app.py
+app_port: 7860
+license: mit
