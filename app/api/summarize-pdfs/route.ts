@@ -52,33 +52,66 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // For now, return a simple response indicating the feature is working
-    // In production, you would integrate with your Python backend or implement the logic here
-    const summaries = files.map((file, index) => ({
-      filename: file.name,
-      title: `Analysis of ${file.name}`,
-      summary: `This is a placeholder summary for ${file.name}. Research goal: ${goal}. 
+    // Connect to FastAPI backend for real PDF processing
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7860'
+    
+    try {
+      // Create form data to send to FastAPI backend
+      const backendFormData = new FormData()
       
-The system has successfully received your PDF and research goal. In a production environment, this would:
-1. Extract text from the PDF using advanced OCR/parsing
-2. Apply AI-powered relevance filtering based on your research goal
-3. Generate comprehensive summaries using language models
-4. Provide detailed analysis and insights
-
-File details:
-- Name: ${file.name}
-- Size: ${(file.size / 1024 / 1024).toFixed(2)} MB
-- Type: ${file.type}
-
-To enable full functionality, integrate with the Python backend modules or implement the summarization logic directly in this API route.`
-    }))
-
-    return NextResponse.json({
-      goal,
-      summaries,
-      status: 'success',
-      message: 'PDF processing completed successfully'
-    })
+      // Add files to form data
+      for (const file of files) {
+        backendFormData.append('files', file)
+      }
+      
+      // Add research goal
+      backendFormData.append('goal', goal)
+      
+      console.log(`Calling FastAPI backend at ${backendUrl}/summarize-hf-pdfs`)
+      console.log(`Processing ${files.length} files with goal: "${goal}"`)
+      
+      // Call FastAPI backend
+      const backendResponse = await fetch(`${backendUrl}/summarize-hf-pdfs`, {
+        method: 'POST',
+        body: backendFormData,
+        // Don't set Content-Type header - let fetch set it for multipart/form-data
+      })
+      
+      if (!backendResponse.ok) {
+        const errorText = await backendResponse.text()
+        console.error('Backend response error:', backendResponse.status, errorText)
+        throw new Error(`Backend processing failed: ${backendResponse.status} ${backendResponse.statusText}`)
+      }
+      
+      const backendData = await backendResponse.json()
+      console.log('Backend processing successful:', backendData)
+      
+      // Transform backend response to match frontend expectations
+      const summaries = backendData.summaries?.map((summary: any) => ({
+        filename: summary.filename || summary.file_name || 'Unknown',
+        title: summary.title || `Analysis of ${summary.filename || summary.file_name}`,
+        summary: summary.summary || summary.content || 'No summary available'
+      })) || []
+      
+      return NextResponse.json({
+        goal: backendData.goal || goal,
+        summaries,
+        status: 'success',
+        message: 'PDF processing completed successfully',
+        backend_response: backendData // Include full backend response for debugging
+      })
+      
+    } catch (backendError) {
+      console.error('Error calling FastAPI backend:', backendError)
+      
+      // Return error with details about backend connectivity
+      return NextResponse.json({
+        error: 'Backend processing failed',
+        details: backendError instanceof Error ? backendError.message : 'Unknown backend error',
+        backend_url: backendUrl,
+        suggestion: 'Make sure the FastAPI backend is running on port 7860'
+      }, { status: 502 })
+    }
 
   } catch (error) {
     console.error('Error processing PDFs:', error)
