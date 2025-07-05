@@ -16,6 +16,7 @@ export function LitLensUploader() {
     { filename: string; title?: string; summary: string }[]
   >([])
   const [isDragging, setIsDragging] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -51,21 +52,24 @@ export function LitLensUploader() {
 
     setIsLoading(true)
     setSummaries([])
+    setError(null)
 
     try {
       const formData = new FormData()
       files.forEach((file) => formData.append("files", file))
       formData.append("goal", researchGoal)
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://ashley-perkins-litlens.hf.space"
-      const res = await fetch(`${apiUrl}/summarize-pdfs`, {
+      const res = await fetch(`/api/summarize-pdfs`, {
         method: "POST",
         body: formData,
       })
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ detail: "Unknown error occurred" }))
-        throw new Error(errorData.detail || `HTTP ${res.status}: ${res.statusText}`)
+        const errorData = await res.json().catch(() => ({ 
+          error: "Unknown error occurred", 
+          details: `HTTP ${res.status}: ${res.statusText}` 
+        }))
+        throw new Error(errorData.error || errorData.detail || `HTTP ${res.status}: ${res.statusText}`)
       }
 
       const data = await res.json()
@@ -83,7 +87,8 @@ export function LitLensUploader() {
     } catch (err) {
       console.error("Error fetching summary:", err)
       const errorMessage = err instanceof Error ? err.message : "Something went wrong while summarizing."
-      setSummaries([{ filename: "Error", summary: errorMessage }])
+      setError(errorMessage)
+      setSummaries([])
     } finally {
       setIsLoading(false)
     }
@@ -174,11 +179,30 @@ export function LitLensUploader() {
         </Button>
       </form>
 
-      {(isLoading || summaries.length > 0) && (
+      {(isLoading || summaries.length > 0 || error) && (
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-3">Summary</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-3">
+            {error ? "Error" : "Summary"}
+          </h3>
           <Card className="p-6 bg-white border border-gray-200 rounded-lg space-y-6">
-            {isLoading ? (
+            {error ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="p-3 rounded-full bg-red-100 mb-4">
+                  <FileText className="h-8 w-8 text-red-600" />
+                </div>
+                <p className="text-red-600 text-center font-medium mb-2">Processing Error</p>
+                <p className="text-gray-600 text-center text-sm max-w-md">
+                  {error}
+                </p>
+                <Button 
+                  onClick={() => setError(null)} 
+                  variant="outline" 
+                  className="mt-4"
+                >
+                  Try Again
+                </Button>
+              </div>
+            ) : isLoading ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <Loader2 className="h-8 w-8 text-[#1F2B3A] animate-spin mb-4" />
                 <p className="text-gray-500">Analyzing your document(s)...</p>
