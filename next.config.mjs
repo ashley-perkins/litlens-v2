@@ -22,9 +22,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  serverExternalPackages: [],
 }
 
 export default nextConfig
