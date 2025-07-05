@@ -3,6 +3,18 @@ import { headers } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
+    // Check content length before processing
+    const contentLength = request.headers.get('content-length')
+    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) { // 10MB limit
+      return NextResponse.json(
+        { 
+          error: 'Request too large',
+          details: 'Total file size exceeds 10MB limit. Please reduce file size or number of files.'
+        },
+        { status: 413 }
+      )
+    }
+
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
     const goal = formData.get('goal') as string
@@ -18,6 +30,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Research goal is required' },
         { status: 400 }
+      )
+    }
+
+    // Validate individual file sizes
+    const MAX_FILE_SIZE = 4 * 1024 * 1024 // 4MB per file
+    const MAX_TOTAL_SIZE = 10 * 1024 * 1024 // 10MB total
+    
+    let totalSize = 0
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { 
+            error: 'File too large',
+            details: `${file.name} exceeds 4MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`
+          },
+          { status: 413 }
+        )
+      }
+      totalSize += file.size
+    }
+    
+    if (totalSize > MAX_TOTAL_SIZE) {
+      return NextResponse.json(
+        { 
+          error: 'Total size too large',
+          details: `Combined files exceed 10MB limit. Current size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`
+        },
+        { status: 413 }
       )
     }
 

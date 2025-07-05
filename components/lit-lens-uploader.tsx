@@ -17,10 +17,52 @@ export function LitLensUploader() {
   >([])
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // File size limits (in MB)
+  const MAX_FILE_SIZE_MB = 4 // Conservative limit for Vercel
+  const MAX_TOTAL_SIZE_MB = 10
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const validateFiles = (fileList: File[]) => {
+    const errors: string[] = []
+    
+    // Check individual file sizes
+    for (const file of fileList) {
+      const fileSizeMB = file.size / (1024 * 1024)
+      if (fileSizeMB > MAX_FILE_SIZE_MB) {
+        errors.push(`${file.name} is too large (${formatFileSize(file.size)}). Maximum size per file: ${MAX_FILE_SIZE_MB}MB`)
+      }
+    }
+    
+    // Check total size
+    const totalSize = fileList.reduce((sum, file) => sum + file.size, 0)
+    const totalSizeMB = totalSize / (1024 * 1024)
+    if (totalSizeMB > MAX_TOTAL_SIZE_MB) {
+      errors.push(`Total file size too large (${formatFileSize(totalSize)}). Maximum total: ${MAX_TOTAL_SIZE_MB}MB`)
+    }
+    
+    return errors
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFiles(Array.from(e.target.files))
+      const fileList = Array.from(e.target.files)
+      const validationErrors = validateFiles(fileList)
+      
+      if (validationErrors.length > 0) {
+        setError(validationErrors.join('\n'))
+        return
+      }
+      
+      setFiles(fileList)
+      setError(null)
     }
   }
 
@@ -41,7 +83,16 @@ export function LitLensUploader() {
       const droppedFiles = Array.from(e.dataTransfer.files).filter(
         (f) => f.type === "application/pdf"
       )
+      
+      const validationErrors = validateFiles(droppedFiles)
+      
+      if (validationErrors.length > 0) {
+        setError(validationErrors.join('\n'))
+        return
+      }
+      
       setFiles(droppedFiles)
+      setError(null)
     }
   }
 
@@ -65,6 +116,10 @@ export function LitLensUploader() {
       })
 
       if (!res.ok) {
+        if (res.status === 413) {
+          throw new Error(`Files too large for upload. Please ensure each file is under ${MAX_FILE_SIZE_MB}MB and total size is under ${MAX_TOTAL_SIZE_MB}MB.`)
+        }
+        
         const errorData = await res.json().catch(() => ({ 
           error: "Unknown error occurred", 
           details: `HTTP ${res.status}: ${res.statusText}` 
@@ -146,6 +201,29 @@ export function LitLensUploader() {
             />
           </div>
         </div>
+
+        {files.length > 0 && (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Selected Files:</h4>
+            <div className="space-y-2">
+              {files.map((file, index) => (
+                <div key={index} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600 truncate flex-1">{file.name}</span>
+                  <span className="text-gray-500 ml-2">{formatFileSize(file.size)}</span>
+                </div>
+              ))}
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between items-center text-sm font-medium">
+                  <span>Total Size:</span>
+                  <span>{formatFileSize(files.reduce((sum, file) => sum + file.size, 0))}</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Limit: {MAX_FILE_SIZE_MB}MB per file, {MAX_TOTAL_SIZE_MB}MB total
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-2">
           <label htmlFor="research-goal" className="block text-sm font-medium text-gray-700">
