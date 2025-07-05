@@ -19,8 +19,8 @@ export function LitLensUploader() {
   const [error, setError] = useState<string | null>(null)
   
   // File size limits (in MB)
-  const MAX_FILE_SIZE_MB = 4 // Conservative limit for Vercel
-  const MAX_TOTAL_SIZE_MB = 10
+  const MAX_FILE_SIZE_MB = 10 // Increased limit for larger academic PDFs
+  const MAX_TOTAL_SIZE_MB = 20
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'

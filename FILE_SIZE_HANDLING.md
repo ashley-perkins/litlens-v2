@@ -6,8 +6,8 @@ Fixed 413 "Content Too Large" errors when uploading PDFs to LitLens by implement
 ## File Size Limits
 
 ### Current Limits:
-- **Per File**: 4MB maximum
-- **Total Upload**: 10MB maximum
+- **Per File**: 10MB maximum
+- **Total Upload**: 20MB maximum
 - **Vercel Serverless**: ~4.5MB body limit (Pro accounts)
 
 ### Why These Limits:
@@ -24,7 +24,7 @@ Fixed 413 "Content Too Large" errors when uploading PDFs to LitLens by implement
 const validateFiles = (fileList: File[]) => {
   const errors: string[] = []
   
-  // Check individual file sizes (4MB limit)
+  // Check individual file sizes (10MB limit)
   for (const file of fileList) {
     const fileSizeMB = file.size / (1024 * 1024)
     if (fileSizeMB > MAX_FILE_SIZE_MB) {
@@ -32,7 +32,7 @@ const validateFiles = (fileList: File[]) => {
     }
   }
   
-  // Check total size (10MB limit)
+  // Check total size (20MB limit)
   const totalSize = fileList.reduce((sum, file) => sum + file.size, 0)
   const totalSizeMB = totalSize / (1024 * 1024)
   if (totalSizeMB > MAX_TOTAL_SIZE_MB) {
@@ -55,10 +55,10 @@ const validateFiles = (fileList: File[]) => {
 ```typescript
 // Content-Length header check
 const contentLength = request.headers.get('content-length')
-if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
+if (contentLength && parseInt(contentLength) > 20 * 1024 * 1024) {
   return NextResponse.json({
     error: 'Request too large',
-    details: 'Total file size exceeds 10MB limit'
+    details: 'Total file size exceeds 20MB limit'
   }, { status: 413 })
 }
 
@@ -67,7 +67,7 @@ for (const file of files) {
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json({
       error: 'File too large',
-      details: `${file.name} exceeds 4MB limit`
+      details: `${file.name} exceeds 10MB limit`
     }, { status: 413 })
   }
 }
@@ -81,9 +81,9 @@ for (const file of files) {
 - **User Feedback**: Clear instructions on file size limits
 
 ### Error Message Examples:
-- "Files too large for upload. Please ensure each file is under 4MB"
-- "document.pdf is too large (6.2MB). Maximum size per file: 4MB"
-- "Total file size too large (12.5MB). Maximum total: 10MB"
+- "Files too large for upload. Please ensure each file is under 10MB"
+- "document.pdf is too large (12.2MB). Maximum size per file: 10MB"
+- "Total file size too large (25.5MB). Maximum total: 20MB"
 
 ## User Experience Improvements
 
@@ -95,7 +95,7 @@ Selected Files:
 📄 document3.pdf    0.9 MB
 ─────────────────────────
 Total Size:         4.8 MB
-Limit: 4MB per file, 10MB total
+Limit: 10MB per file, 20MB total
 ```
 
 ### Validation States:

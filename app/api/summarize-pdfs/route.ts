@@ -5,11 +5,11 @@ export async function POST(request: NextRequest) {
   try {
     // Check content length before processing
     const contentLength = request.headers.get('content-length')
-    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) { // 10MB limit
+    if (contentLength && parseInt(contentLength) > 20 * 1024 * 1024) { // 20MB limit
       return NextResponse.json(
         { 
           error: 'Request too large',
-          details: 'Total file size exceeds 10MB limit. Please reduce file size or number of files.'
+          details: 'Total file size exceeds 20MB limit. Please reduce file size or number of files.'
         },
         { status: 413 }
       )
@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate individual file sizes
-    const MAX_FILE_SIZE = 4 * 1024 * 1024 // 4MB per file
-    const MAX_TOTAL_SIZE = 10 * 1024 * 1024 // 10MB total
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB per file
+    const MAX_TOTAL_SIZE = 20 * 1024 * 1024 // 20MB total
     
     let totalSize = 0
     for (const file of files) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { 
             error: 'File too large',
-            details: `${file.name} exceeds 4MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`
+            details: `${file.name} exceeds 10MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`
           },
           { status: 413 }
         )
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Total size too large',
-          details: `Combined files exceed 10MB limit. Current size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`
+          details: `Combined files exceed 20MB limit. Current size: ${(totalSize / 1024 / 1024).toFixed(2)}MB`
         },
         { status: 413 }
       )
