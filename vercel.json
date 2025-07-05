@@ -3,10 +3,12 @@
   "framework": "nextjs",
   "functions": {
     "app/api/summarize-pdfs/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "maxRequestBodySize": "25mb"
     },
     "app/api/*/route.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "maxRequestBodySize": "25mb"
     }
   }
 }

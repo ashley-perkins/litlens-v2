@@ -10,6 +10,14 @@ const nextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: [],
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
+  api: {
+    bodyParser: {
+      sizeLimit: '25mb',
+    },
+  },
 }
 
 export default nextConfig
