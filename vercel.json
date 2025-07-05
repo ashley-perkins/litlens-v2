@@ -3,11 +3,17 @@
   "builds": [
     {
       "src": "frontend/package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     },
     {
-      "src": "backend/app.py",
-      "use": "@vercel/python"
+      "src": "backend/app.py", 
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
   ],
   "routes": [
@@ -17,7 +23,7 @@
     },
     {
       "src": "/docs",
-      "dest": "backend/app.py" 
+      "dest": "backend/app.py"
     },
     {
       "src": "/openapi.json",
@@ -27,5 +33,10 @@
       "src": "/(.*)",
       "dest": "frontend/$1"
     }
-  ]
+  ],
+  "functions": {
+    "backend/app.py": {
+      "maxDuration": 300
+    }
+  }
 }
