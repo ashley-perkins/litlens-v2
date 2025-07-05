@@ -5,7 +5,13 @@ export async function POST(request: NextRequest) {
   try {
     // Check content length before processing
     const contentLength = request.headers.get('content-length')
-    if (contentLength && parseInt(contentLength) > 20 * 1024 * 1024) { // 20MB limit
+    console.log('=== CONTENT LENGTH DEBUG ===')
+    console.log('Content-Length header:', contentLength)
+    console.log('Content-Length in MB:', contentLength ? (parseInt(contentLength) / 1024 / 1024).toFixed(2) : 'N/A')
+    console.log('Content-Length limit:', 25 * 1024 * 1024, 'bytes (25MB)')
+    
+    if (contentLength && parseInt(contentLength) > 25 * 1024 * 1024) { // 25MB limit to account for multipart overhead
+      console.log('❌ Content-Length exceeds limit')
       return NextResponse.json(
         { 
           error: 'Request too large',
@@ -14,6 +20,8 @@ export async function POST(request: NextRequest) {
         { status: 413 }
       )
     }
+    console.log('✅ Content-Length is within limit')
+    console.log('=== END CONTENT LENGTH DEBUG ===')
 
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
@@ -37,9 +45,16 @@ export async function POST(request: NextRequest) {
     const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB per file
     const MAX_TOTAL_SIZE = 20 * 1024 * 1024 // 20MB total
     
+    console.log('=== API VALIDATION DEBUG ===')
+    console.log('MAX_FILE_SIZE:', MAX_FILE_SIZE, 'bytes (', MAX_FILE_SIZE / 1024 / 1024, 'MB)')
+    console.log('MAX_TOTAL_SIZE:', MAX_TOTAL_SIZE, 'bytes (', MAX_TOTAL_SIZE / 1024 / 1024, 'MB)')
+    console.log('Number of files:', files.length)
+    
     let totalSize = 0
     for (const file of files) {
+      console.log(`API File: ${file.name}, Size: ${file.size} bytes, ${(file.size / 1024 / 1024).toFixed(2)}MB`)
       if (file.size > MAX_FILE_SIZE) {
+        console.log(`❌ API: File ${file.name} exceeds limit`)
         return NextResponse.json(
           { 
             error: 'File too large',
@@ -51,7 +66,9 @@ export async function POST(request: NextRequest) {
       totalSize += file.size
     }
     
+    console.log(`API Total size: ${totalSize} bytes, ${(totalSize / 1024 / 1024).toFixed(2)}MB`)
     if (totalSize > MAX_TOTAL_SIZE) {
+      console.log(`❌ API: Total size exceeds limit`)
       return NextResponse.json(
         { 
           error: 'Total size too large',
@@ -60,6 +77,9 @@ export async function POST(request: NextRequest) {
         { status: 413 }
       )
     }
+    
+    console.log('✅ API: All files passed validation')
+    console.log('=== END API DEBUG ===')
 
     // For now, return a simple response indicating the feature is working
     // In production, you would integrate with your Python backend or implement the logic here

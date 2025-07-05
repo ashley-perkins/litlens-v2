@@ -33,20 +33,36 @@ export function LitLensUploader() {
   const validateFiles = (fileList: File[]) => {
     const errors: string[] = []
     
+    // Debug logging
+    console.log('=== FILE VALIDATION DEBUG ===')
+    console.log('MAX_FILE_SIZE_MB:', MAX_FILE_SIZE_MB)
+    console.log('MAX_TOTAL_SIZE_MB:', MAX_TOTAL_SIZE_MB)
+    
     // Check individual file sizes
     for (const file of fileList) {
       const fileSizeMB = file.size / (1024 * 1024)
+      console.log(`File: ${file.name}, Size: ${file.size} bytes, ${fileSizeMB.toFixed(2)}MB, Limit: ${MAX_FILE_SIZE_MB}MB`)
       if (fileSizeMB > MAX_FILE_SIZE_MB) {
+        console.log(`❌ File ${file.name} exceeds limit`)
         errors.push(`${file.name} is too large (${formatFileSize(file.size)}). Maximum size per file: ${MAX_FILE_SIZE_MB}MB`)
+      } else {
+        console.log(`✅ File ${file.name} is within limit`)
       }
     }
     
     // Check total size
     const totalSize = fileList.reduce((sum, file) => sum + file.size, 0)
     const totalSizeMB = totalSize / (1024 * 1024)
+    console.log(`Total size: ${totalSize} bytes, ${totalSizeMB.toFixed(2)}MB, Limit: ${MAX_TOTAL_SIZE_MB}MB`)
     if (totalSizeMB > MAX_TOTAL_SIZE_MB) {
+      console.log(`❌ Total size exceeds limit`)
       errors.push(`Total file size too large (${formatFileSize(totalSize)}). Maximum total: ${MAX_TOTAL_SIZE_MB}MB`)
+    } else {
+      console.log(`✅ Total size is within limit`)
     }
+    
+    console.log('Validation errors:', errors)
+    console.log('=== END DEBUG ===')
     
     return errors
   }
