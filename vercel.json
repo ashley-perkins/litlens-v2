@@ -28,9 +28,4 @@
       "dest": "frontend/$1"
     }
   ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key",
-    "HUGGINGFACE_API_TOKEN": "@huggingface_api_token",
-    "ENVIRONMENT": "production"
-  }
 }
