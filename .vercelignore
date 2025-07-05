@@ -1,0 +1,31 @@
+# Ignore Python backend files during Vercel deployment
+backend/
+examples/
+deploy.sh
+Dockerfile
+*.py
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore documentation that's not needed for deployment
+COMPLETE_REFACTORING_SUMMARY.md
+DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_GUIDE.md
+EMBEDDING_REFACTOR_SUMMARY.md
+GITHUB_DEPLOYMENT_COMPLETE.md
+PDF_EXTRACTOR_IMPROVEMENTS.md
+PRODUCTION_FIX_SUMMARY.md
+REFACTORING_SUMMARY.md
+RELEVANCE_FILTER_REFACTOR_DOCUMENTATION.md
+
+# Ignore alternative package.json files
+package-full.json
+package-minimal.json
+
+# Ignore alternative vercel configs
+vercel-*.json
