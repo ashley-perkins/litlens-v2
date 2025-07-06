@@ -10,9 +10,6 @@ const nextConfig = {
     unoptimized: true,
   },
   serverExternalPackages: [],
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
 }
 
 export default nextConfig
