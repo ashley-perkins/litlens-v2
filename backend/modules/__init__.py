@@ -1,9 +1,11 @@
 # backend/modules/__init__.py
 """
-LitLens Embedding Modules
+LitLens OpenAI-Only Modules
 
-This package provides a unified interface for embedding text using both OpenAI and HuggingFace models.
-The interface includes advanced features like caching, batch processing, error handling, and metrics.
+This package provides OpenAI-powered functionality for:
+- Text embeddings using OpenAI Ada-002
+- Summarization using GPT-4
+- PDF text extraction and processing
 """
 
 from .base_embedder import (
@@ -15,18 +17,7 @@ from .base_embedder import (
     EmbeddingCache
 )
 
-# Temporarily disable ALL embedder imports to get basic functionality working
-# from .openai_embedder import OpenAIEmbedder
-# from .huggingface_embedder import HuggingFaceEmbedder
-
-# from .embedding_factory import (
-#     EmbeddingFactory,
-#     embedding_factory,
-#     create_embedder,
-#     create_openai_embedder,
-#     create_huggingface_embedder,
-#     get_available_models
-# )
+from .openai_embedder import OpenAIEmbedder
 
 __all__ = [
     # Base classes
@@ -37,19 +28,10 @@ __all__ = [
     'EmbeddingMetrics',
     'EmbeddingCache',
     
-    # Embedder implementations (ALL temporarily disabled)
-    # 'OpenAIEmbedder',
-    # 'HuggingFaceEmbedder',
-    
-    # Factory (temporarily disabled)
-    # 'EmbeddingFactory',
-    # 'embedding_factory',
-    # 'create_embedder',
-    # 'create_openai_embedder',
-    # 'create_huggingface_embedder',
-    # 'get_available_models'
+    # OpenAI embedder
+    'OpenAIEmbedder',
 ]
 
-__version__ = '0.4.0'
+__version__ = '1.0.0'
 __author__ = 'LitLens Development Team'
-__description__ = 'Unified embedding interface for LitLens'
+__description__ = 'OpenAI-powered embedding and processing for LitLens'

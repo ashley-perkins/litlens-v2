@@ -67,11 +67,11 @@ export async function POST(request: NextRequest) {
       // Add research goal
       backendFormData.append('goal', goal)
       
-      console.log(`Calling FastAPI backend at ${backendUrl}/summarize-hf-pdfs`)
+      console.log(`Calling FastAPI backend at ${backendUrl}/summarize-pdfs`)
       console.log(`Processing ${files.length} files with goal: "${goal}"`)
       
-      // Call FastAPI backend
-      const backendResponse = await fetch(`${backendUrl}/summarize-hf-pdfs`, {
+      // Call FastAPI backend (OpenAI-powered)
+      const backendResponse = await fetch(`${backendUrl}/summarize-pdfs`, {
         method: 'POST',
         body: backendFormData,
         // Don't set Content-Type header - let fetch set it for multipart/form-data

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.api.routes_minimal import router
+from backend.api.routes_openai import router
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 
