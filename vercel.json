@@ -7,6 +7,16 @@
     },
     "app/api/*/route.ts": {
       "maxDuration": 60
+    },
+    "api/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/backend/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
 }
