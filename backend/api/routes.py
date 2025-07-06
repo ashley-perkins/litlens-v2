@@ -29,11 +29,12 @@ from backend.api.models import (
     FileUploadMixin,
     StatusEnum
 )
-from backend.modules import summarizer, pdf_extractor, embedder, relevance_filter, report_generator
-from backend.utils import output_writer, hf_utils, embedder_hf
-from backend.utils.pdf_utils import extract_pdf_metadata
-from backend.utils.output_writer import sanitize_filename
-from backend.utils.hf_utils import summarize_text_with_hf_api
+# Temporarily disable complex imports to get basic API running
+# from backend.modules import summarizer, pdf_extractor, embedder, relevance_filter, report_generator
+# from backend.utils import output_writer, hf_utils, embedder_hf
+# from backend.utils.pdf_utils import extract_pdf_metadata
+# from backend.utils.output_writer import sanitize_filename
+# from backend.utils.hf_utils import summarize_text_with_hf_api
 
 # === Configure logger ===
 logging.basicConfig(

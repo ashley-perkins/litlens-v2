@@ -15,17 +15,18 @@ from .base_embedder import (
     EmbeddingCache
 )
 
-from .openai_embedder import OpenAIEmbedder
-from .huggingface_embedder import HuggingFaceEmbedder
+# Temporarily disable ALL embedder imports to get basic functionality working
+# from .openai_embedder import OpenAIEmbedder
+# from .huggingface_embedder import HuggingFaceEmbedder
 
-from .embedding_factory import (
-    EmbeddingFactory,
-    embedding_factory,
-    create_embedder,
-    create_openai_embedder,
-    create_huggingface_embedder,
-    get_available_models
-)
+# from .embedding_factory import (
+#     EmbeddingFactory,
+#     embedding_factory,
+#     create_embedder,
+#     create_openai_embedder,
+#     create_huggingface_embedder,
+#     get_available_models
+# )
 
 __all__ = [
     # Base classes
@@ -36,17 +37,17 @@ __all__ = [
     'EmbeddingMetrics',
     'EmbeddingCache',
     
-    # Embedder implementations
-    'OpenAIEmbedder',
-    'HuggingFaceEmbedder',
+    # Embedder implementations (ALL temporarily disabled)
+    # 'OpenAIEmbedder',
+    # 'HuggingFaceEmbedder',
     
-    # Factory
-    'EmbeddingFactory',
-    'embedding_factory',
-    'create_embedder',
-    'create_openai_embedder',
-    'create_huggingface_embedder',
-    'get_available_models'
+    # Factory (temporarily disabled)
+    # 'EmbeddingFactory',
+    # 'embedding_factory',
+    # 'create_embedder',
+    # 'create_openai_embedder',
+    # 'create_huggingface_embedder',
+    # 'get_available_models'
 ]
 
 __version__ = '0.4.0'
