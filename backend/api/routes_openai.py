@@ -26,7 +26,6 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 import tiktoken
 
 load_dotenv()
@@ -80,6 +79,15 @@ class OpenAIProcessor:
         text = re.sub(r'\(cid:\d+\)', '', text)  # CID characters
         
         return text.strip()
+    
+    def cosine_similarity(self, a: np.ndarray, b: np.ndarray) -> float:
+        """Calculate cosine similarity between two vectors"""
+        dot_product = np.dot(a, b)
+        norm_a = np.linalg.norm(a)
+        norm_b = np.linalg.norm(b)
+        if norm_a == 0 or norm_b == 0:
+            return 0
+        return dot_product / (norm_a * norm_b)
         
     async def extract_pdf_text(self, file_content: bytes, filename: str) -> str:
         """Extract text from PDF using pdfminer.six"""
@@ -184,11 +192,15 @@ class OpenAIProcessor:
             all_texts = [goal] + chunks
             embeddings = await self.get_embeddings(all_texts)
             
-            goal_embedding = np.array(embeddings[0]).reshape(1, -1)
+            goal_embedding = np.array(embeddings[0])
             chunk_embeddings = np.array(embeddings[1:])
             
             # Calculate similarities
-            similarities = cosine_similarity(goal_embedding, chunk_embeddings)[0]
+            similarities = []
+            for chunk_embedding in chunk_embeddings:
+                similarity = self.cosine_similarity(goal_embedding, chunk_embedding)
+                similarities.append(similarity)
+            similarities = np.array(similarities)
             
             # Filter chunks above threshold
             relevant_chunks = []
