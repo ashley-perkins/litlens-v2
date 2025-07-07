@@ -53,9 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Connect to FastAPI backend for real PDF processing
-    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || (
-      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/backend` : 'http://localhost:7861'
-    )
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7861'
     
     try {
       // Create form data to send to FastAPI backend
